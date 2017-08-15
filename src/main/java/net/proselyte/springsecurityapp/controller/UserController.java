@@ -8,9 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Controller for {@link net.proselyte.springsecurityapp.model.User}'s pages.
@@ -50,6 +49,8 @@ public class UserController {
 
         securityService.autoLogin(userForm.getUsername(), userForm.getConfirmPassword());
 
+        model.addAttribute("theUser", userForm);
+
         return "redirect:/welcome";
     }
 
@@ -66,13 +67,20 @@ public class UserController {
         return "login";
     }
 
+
+    @RequestMapping(value = {"/welcome/{userId}"}, method = RequestMethod.GET)
+    public String findOwner (@PathVariable String userId,@RequestParam("button") String button, Model model) {
+        if(button.equals("delete"))
+            userService.delete(Long.parseLong(userId));
+        else
+            userService.block(Long.parseLong(userId));
+        return  "welcome" ;
+    }
+
     @RequestMapping(value = {"/", "/welcome"}, method = RequestMethod.GET)
     public String welcome(Model model) {
+        model.addAttribute("userList", userService.getAllUsers());
         return "welcome";
     }
 
-    @RequestMapping(value = "/admin", method = RequestMethod.GET)
-    public String admin(Model model) {
-        return "admin";
-    }
 }

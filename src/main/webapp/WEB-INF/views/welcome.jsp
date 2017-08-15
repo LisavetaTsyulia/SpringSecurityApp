@@ -1,5 +1,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 
@@ -27,6 +28,34 @@
 
         <h2>Welcome ${pageContext.request.userPrincipal.name} | <a onclick="document.forms['logoutForm'].submit()">Logout</a>
         </h2>
+
+        <form action="welcome/fred">
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Submit</button>
+        </form>
+
+
+
+
+        <table class = "table">
+            <c:forEach items="${userList}" var="someUser">
+                <c:if test="${pageContext.request.userPrincipal.name != someUser.username}">
+                    <tr class="th">
+                       <th class="th, text-center"> <c:out value = "${someUser.username}"/> </th>
+
+                       <th class="th, text-center">
+                           <form action = "/welcome/${someUser.id}">
+                           <button class="btn-primary" type = "submit" name="button" value="delete">Delete</button>
+                           </form>
+                       </th>
+                       <th class="th, text-center">
+                           <form action = "/welcome/${someUser.id}">
+                           <button class="btn-primary" type="submit" name="button" value="block">Block</button>
+                           </form>
+                       </th>
+                    </tr>
+                </c:if>
+            </c:forEach>
+        </table>
 
     </c:if>
 

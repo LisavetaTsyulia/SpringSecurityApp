@@ -46,3 +46,23 @@ body {
 .has-error {
     color: red
 }
+.table {
+    color: #333; /* Lighten up font color */
+    font-family: Helvetica, Arial, sans-serif; /* Nicer font */
+    width: 640px;
+    border-collapse:
+            collapse; border-spacing: 0;
+}
+
+.td {border: 1px solid #CCC; height: 30px; }
+.th { border: 1px solid #CCC; height: 30px; } /* Make cells a bit taller */
+
+.th {
+    background: #F3F3F3; /* Light grey background */
+    font-weight: bold; /* Make sure they're bold */
+}
+
+.td {
+    background: #FAFAFA; /* Lighter grey background */
+    text-align: center; /* Center our text */
+}
