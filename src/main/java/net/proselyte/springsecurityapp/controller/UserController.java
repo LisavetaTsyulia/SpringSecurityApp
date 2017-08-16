@@ -9,14 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
-/**
- * Controller for {@link net.proselyte.springsecurityapp.model.User}'s pages.
- *
- * @author Eugene Suleimanov
- * @version 1.0
- */
 
 @Controller
 public class UserController {
@@ -63,24 +56,32 @@ public class UserController {
         if (logout != null) {
             model.addAttribute("message", "Logged out successfully.");
         }
-
         return "login";
     }
 
 
     @RequestMapping(value = {"/welcome/{userId}"}, method = RequestMethod.GET)
     public String findOwner (@PathVariable String userId,@RequestParam("button") String button, Model model) {
+        Long id = Long.parseLong(userId);
+        model.addAttribute("userStatus", userService.findById(id));
         if(button.equals("delete"))
-            userService.delete(Long.parseLong(userId));
+            userService.delete(id);
         else
-            userService.block(Long.parseLong(userId));
+            userService.block(id);
+        model.addAttribute("userList", userService.getAllUsers());
         return  "welcome" ;
     }
 
     @RequestMapping(value = {"/", "/welcome"}, method = RequestMethod.GET)
-    public String welcome(Model model) {
+    public String welcome(@ModelAttribute("userName") String userName, Model model) {
         model.addAttribute("userList", userService.getAllUsers());
+        //model.addAttribute("userStatus", userService.findByUsername(userName).getStatus());
         return "welcome";
+    }
+
+    @RequestMapping(value = {"/redirect"}, method = RequestMethod.GET)
+    public String redirect(Model model) {
+        return "new";
     }
 
 }

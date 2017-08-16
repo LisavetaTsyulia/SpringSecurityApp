@@ -25,9 +25,18 @@ public class UserServiceImpl implements UserService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
+    public User findById(Long id) {
+        return userDao.findById(id);
+    }
+
+    @Override
     public void block(Long id) {
         User user = userDao.findById(id);
-        user.setStatus("BLOCKED");
+        String status = user.getStatus();
+        if (status.equals("BLOCKED"))
+            user.setStatus("ACTIVE");
+        else
+            user.setStatus("BLOCKED");
         userDao.saveAndFlush(user);
     }
 

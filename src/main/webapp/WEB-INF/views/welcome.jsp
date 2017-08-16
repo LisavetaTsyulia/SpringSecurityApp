@@ -29,35 +29,42 @@
         <h2>Welcome ${pageContext.request.userPrincipal.name} | <a onclick="document.forms['logoutForm'].submit()">Logout</a>
         </h2>
 
-        <form action="welcome/fred">
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Submit</button>
-        </form>
-
-
-
-
         <table class = "table">
-            <c:forEach items="${userList}" var="someUser">
-                <c:if test="${pageContext.request.userPrincipal.name != someUser.username}">
-                    <tr class="th">
-                       <th class="th, text-center"> <c:out value = "${someUser.username}"/> </th>
+        <%--
+        <c:if test="${pageContext.request.userPrincipal.status eq 'BLOCKED'}">
+            <form action="/redirect">
+                <input type="submit">
+            </form>
+        </c:if>
+        --%>
+        <c:forEach items="${userList}" var="someUser">
+            <c:if test="${pageContext.request.userPrincipal.name != someUser.username}">
+                <tr class="th">
+                   <th class="th, text-center"> <c:out value = "${someUser.username}"/> </th>
 
-                       <th class="th, text-center">
-                           <form action = "/welcome/${someUser.id}">
-                           <button class="btn-primary" type = "submit" name="button" value="delete">Delete</button>
-                           </form>
-                       </th>
-                       <th class="th, text-center">
-                           <form action = "/welcome/${someUser.id}">
-                           <button class="btn-primary" type="submit" name="button" value="block">Block</button>
-                           </form>
-                       </th>
-                    </tr>
-                </c:if>
-            </c:forEach>
-        </table>
+                   <th class="th, text-center">
+                       <form action = "/welcome/${someUser.id}">
+                       <button class="my_button custom" type = "submit" name="button" value="delete">Delete</button>
+                       </form>
+                   </th>
+                   <th class="th, text-center">
+                       <form action = "/welcome/${someUser.id}">
+                               <button class="my_button custom" type="submit" name="button" value="block">
+                                   <c:if test="${someUser.status == 'ACTIVE'}">
+                                       Block
+                                   </c:if>
+                                   <c:if test="${someUser.status == 'BLOCKED'}">
+                                       Unlock
+                                   </c:if>
+                               </button>
+                       </form>
+                   </th>
+                </tr>
+            </c:if>
+        </c:forEach>
+    </table>
 
-    </c:if>
+</c:if>
 
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
