@@ -18,7 +18,6 @@
     <link href="${contextPath}/resources/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-
 <div class="container">
 
     <c:if test="${pageContext.request.userPrincipal.name != null}">
@@ -30,13 +29,7 @@
         </h2>
 
         <table class = "table">
-        <%--
-        <c:if test="${pageContext.request.userPrincipal.status eq 'BLOCKED'}">
-            <form action="/redirect">
-                <input type="submit">
-            </form>
-        </c:if>
-        --%>
+
         <c:forEach items="${userList}" var="someUser">
             <c:if test="${pageContext.request.userPrincipal.name != someUser.username}">
                 <tr class="th">
@@ -69,5 +62,17 @@
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script src="${contextPath}/resources/js/bootstrap.min.js"></script>
+<%--
+<script>
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "http://localhost:8087/redirect", true);
+    xhr.send("old");
+    if (xhr.status !== 200) {
+        alert( xhr.status + ': ' + xhr.statusText );
+    } else {
+        alert( xhr.responseText );
+    }
+</script>
+--%>
 </body>
 </html>

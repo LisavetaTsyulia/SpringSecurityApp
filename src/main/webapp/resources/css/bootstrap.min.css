@@ -7,6 +7,13 @@
     width: 78px !important;
 }
 
+.blocked {
+    font-family: inherit;
+    font-weight: 500;
+    line-height: 1.1;
+    color: #a94442;
+}
+
 .my_button {
     display: inline-block;
     -webkit-box-sizing: content-box;

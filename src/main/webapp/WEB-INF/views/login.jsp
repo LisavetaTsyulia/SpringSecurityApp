@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
+
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 
 <!DOCTYPE html>
@@ -24,8 +25,53 @@
 </head>
 
 <body>
+<script>
+    function checkLoginState() {
+        FB.getLoginStatus(function(response) {
+            statusChangeCallback(response);
+        });
+    }
 
+    function statusChangeCallback(response) {
+        if (response.status === 'connected') {
+            FB.api('/me', function(response) {
+                console.log(response);
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "http://localhost:8087/new", true);
+                xhr.send(response);
+                if (xhr.status !== 200) {
+                    alert( xhr.status + ': ' + xhr.statusText );
+                } else {
+                    alert( xhr.responseText );
+                }
+            });
+        }
+    }
+
+    window.fbAsyncInit = function() {
+        FB.init({
+            appId      : '115210109141200',
+            cookie     : true,
+            xfbml      : true,
+            version    : 'v2.8'
+        });
+
+        FB.getLoginStatus(function(response) {
+            statusChangeCallback(response);
+        });
+
+    };
+
+    (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+</script>
 <div class="container">
+
 
     <form method="POST" action="${contextPath}/login" class="form-signin">
         <h2 class="form-heading">Log in</h2>
@@ -40,6 +86,27 @@
 
             <button class="btn btn-lg btn-primary btn-block" type="submit">Log In</button>
             <h4 class="text-center"><a href="${contextPath}/registration">Create an account</a></h4>
+            <%--
+            <fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+            </fb:login-button>
+            --%>
+            <script src="//ulogin.ru/js/ulogin.js"></script>
+            <div id="uLogin" data-ulogin="display=panel;theme=classic;fields=first_name,last_name;providers=vkontakte,odnoklassniki,mailru,facebook;hidden=other;redirect_uri=;callback=preview;mobilebuttons=0;"></div>
+            <script>
+                function preview(token) {
+                    $.getJSON("//ulogin.ru/token.php?host=" + encodeURIComponent(location.toString()) + "&token=" + token + "&callback=?", function (data) {
+                        document.write(data)
+                        data = $.parseJSON(data.toString());
+                        if (!data.error) {
+                            $.ajax({
+                                type: "GET",
+                                url: "/redirect",
+                                data: {first_name: data.first_name, last_name: data.last_name, uid: data.uid} // parameters
+                            })
+                        }
+                    });
+                }
+            </script>
         </div>
 
     </form>
