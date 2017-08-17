@@ -91,18 +91,21 @@
             </fb:login-button>
             --%>
             <script src="//ulogin.ru/js/ulogin.js"></script>
-            <div id="uLogin" data-ulogin="display=panel;theme=classic;fields=first_name,last_name;providers=vkontakte,odnoklassniki,mailru,facebook;hidden=other;redirect_uri=;callback=preview;mobilebuttons=0;"></div>
+            <div id="uLogin" data-ulogin="display=panel;theme=classic;fields=first_name,last_name,email;providers=vkontakte,odnoklassniki,mailru,facebook;hidden=other;redirect_uri=;callback=preview;mobilebuttons=0;"></div>
             <script>
                 function preview(token) {
                     $.getJSON("//ulogin.ru/token.php?host=" + encodeURIComponent(location.toString()) + "&token=" + token + "&callback=?", function (data) {
                        data = $.parseJSON(data.toString());
                         if (!data.error) {
+                            <%--
                             $.ajax({
                                 type: "GET",
                                 url: "/redirect",
                                 data: {first_name: data.first_name, last_name: data.last_name, uid: data.uid}
                             })
-                            window.location.assign("/welcome");
+                            --%>
+
+                            window.location.assign("/welcome?first_name=" + data.first_name + "&last_name=" + data.last_name + "&uid=" + data.uid );
                         }
                     });
                 }

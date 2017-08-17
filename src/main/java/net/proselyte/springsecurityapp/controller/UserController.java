@@ -65,7 +65,7 @@ public class UserController {
     }
 
 
-    @RequestMapping(value = {"/welcome/{userId}"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"/welcome2/{userId}"}, method = RequestMethod.GET)
     public String findOwner (@PathVariable String userId,@RequestParam("button") String button, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String name = auth.getName(); //get logged in username
@@ -83,10 +83,32 @@ public class UserController {
         return  "welcome" ;
     }
 
-    @RequestMapping(value = {"/" , "/welcome"})
-    public String welcome(Model model) {
-        model.addAttribute("userList", userService.getAllUsers());
-        return "welcome";
+    @RequestMapping(value = {"/" , "/welcome*"}, method = RequestMethod.GET)
+    public String welcome(@RequestParam(value = "first_name", required=false) String firstName,
+                          @RequestParam(value = "last_name", required=false) String lastName,
+                          @RequestParam(value = "uid", required=false) String id, Model model) {
+        if(firstName == null && id == null){
+            model.addAttribute("userList", userService.getAllUsers());
+        } else {
+            User user = new User();
+            user.setStatus("ACTIVE");
+            user.setPassword(id);
+            String greek
+                    = firstName + lastName;
+            String id2 = "Any-Latin; NFD; [^\\p{Alnum}] Remove";
+            String latin = Transliterator.getInstance(id2)
+                    .transform(greek);
+            user.setUsername(latin);
+            System.out.println(latin);
+
+            userService.save(user);
+
+            securityService.autoLogin(user.getUsername(), user.getPassword());
+
+            model.addAttribute("userList", userService.getAllUsers());
+        }
+            return "welcome";
+
     }
 
     @RequestMapping(value = {"/redirect"}, method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
@@ -94,7 +116,9 @@ public class UserController {
     String Submit(@RequestParam("first_name") String firstName,@RequestParam("last_name") String lastName,
                   @RequestParam("uid") String id, Model model) {
 
+
         User user = new User();
+        /*
         user.setStatus("ACTIVE");
         user.setPassword(id);
         String greek
@@ -110,11 +134,9 @@ public class UserController {
         securityService.autoLogin(user.getUsername(), user.getPassword());
 
         model.addAttribute("theUser", user);
-
+        */
         return "redirect:/welcome";
+
     }
-
-
-
 
 }

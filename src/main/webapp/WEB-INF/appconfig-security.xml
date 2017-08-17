@@ -9,26 +9,26 @@
 
     <http auto-config="true">
         <intercept-url pattern="/" access="hasRole('ROLE_USER')"/>
-        <intercept-url pattern="/welcome" access="hasRole('ROLE_USER')"/>
-        <intercept-url pattern="/new" access="hasRole('ROLE_USER')"/>
+        <!--<intercept-url pattern="/welcome" access="hasRole('ROLE_USER')"/>-->
+       <intercept-url pattern="/new" access="hasRole('ROLE_USER')"/>
 
-        <form-login login-page="/login" default-target-url="/welcome" authentication-failure-url="/login?error"
-                    username-parameter="username" password-parameter="password"/>
+       <form-login login-page="/login" default-target-url="/welcome" authentication-failure-url="/login?error"
+                   username-parameter="username" password-parameter="password"/>
 
-        <logout logout-success-url="/login?logout"/>
-    </http>
+       <logout logout-success-url="/login?logout"/>
+   </http>
 
-    <authentication-manager alias="authenticationManager">
-        <authentication-provider user-service-ref="userDetailsServiceImpl">
-            <password-encoder ref="encoder"></password-encoder>
-        </authentication-provider>
-    </authentication-manager>
+   <authentication-manager alias="authenticationManager">
+       <authentication-provider user-service-ref="userDetailsServiceImpl">
+           <password-encoder ref="encoder"></password-encoder>
+       </authentication-provider>
+   </authentication-manager>
 
-    <beans:bean id="userDetailsServiceImpl"
-                class="net.proselyte.springsecurityapp.service.UserDetailsServiceImpl"></beans:bean>
+   <beans:bean id="userDetailsServiceImpl"
+               class="net.proselyte.springsecurityapp.service.UserDetailsServiceImpl"></beans:bean>
 
-    <beans:bean id="encoder"
-                class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
-        <beans:constructor-arg name="strength" value="11"/>
-    </beans:bean>
+   <beans:bean id="encoder"
+               class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+       <beans:constructor-arg name="strength" value="11"/>
+   </beans:bean>
 </beans:beans>

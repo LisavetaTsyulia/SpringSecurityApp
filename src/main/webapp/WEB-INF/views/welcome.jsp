@@ -39,12 +39,12 @@
                    <th class="th, text-center"> <c:out value = "${someUser.username}"/> </th>
 
                    <th class="th, text-center">
-                       <form action = "/welcome/${someUser.id}">
+                       <form action = "/welcome2/${someUser.id}">
                        <button class="my_button custom" type = "submit" name="button" value="delete">Delete</button>
                        </form>
                    </th>
                    <th class="th, text-center">
-                       <form action = "/welcome/${someUser.id}">
+                       <form action = "/welcome2/${someUser.id}">
                                <button class="my_button custom" type="submit" name="button" value="block">
                                    <c:if test="${someUser.status == 'ACTIVE'}">
                                        Block
