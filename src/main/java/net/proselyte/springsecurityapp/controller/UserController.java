@@ -14,7 +14,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import com.ibm.icu.text.Transliterator;
 
-import java.util.List;
 
 
 @Controller
@@ -84,20 +83,17 @@ public class UserController {
         return  "welcome" ;
     }
 
-    @RequestMapping(value = {"/", "/welcome"}, method = RequestMethod.GET)
-    public String welcome(@ModelAttribute("userName") String userName, Model model) {
+    @RequestMapping(value = {"/" , "/welcome"})
+    public String welcome(Model model) {
         model.addAttribute("userList", userService.getAllUsers());
         return "welcome";
     }
 
-
-
-
     @RequestMapping(value = {"/redirect"}, method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody
     String Submit(@RequestParam("first_name") String firstName,@RequestParam("last_name") String lastName,
-                  @RequestParam("uid") String id) {
-        
+                  @RequestParam("uid") String id, Model model) {
+
         User user = new User();
         user.setStatus("ACTIVE");
         user.setPassword(id);
@@ -112,7 +108,10 @@ public class UserController {
         userService.save(user);
 
         securityService.autoLogin(user.getUsername(), user.getPassword());
-        return "welcome";
+
+        model.addAttribute("theUser", user);
+
+        return "redirect:/welcome";
     }
 
 

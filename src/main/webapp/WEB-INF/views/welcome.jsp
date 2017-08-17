@@ -28,8 +28,11 @@
         <h2>Welcome ${pageContext.request.userPrincipal.name} | <a onclick="document.forms['logoutForm'].submit()">Logout</a>
         </h2>
 
-        <table class = "table">
+        <table class = "table_price">
 
+            <col width="400px" />
+            <col width="70px" />
+            <col width="70px" />
         <c:forEach items="${userList}" var="someUser">
             <c:if test="${pageContext.request.userPrincipal.name != someUser.username}">
                 <tr class="th">

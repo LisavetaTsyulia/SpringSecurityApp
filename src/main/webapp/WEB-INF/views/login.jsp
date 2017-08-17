@@ -95,14 +95,14 @@
             <script>
                 function preview(token) {
                     $.getJSON("//ulogin.ru/token.php?host=" + encodeURIComponent(location.toString()) + "&token=" + token + "&callback=?", function (data) {
-                        document.write(data)
-                        data = $.parseJSON(data.toString());
+                       data = $.parseJSON(data.toString());
                         if (!data.error) {
                             $.ajax({
                                 type: "GET",
                                 url: "/redirect",
-                                data: {first_name: data.first_name, last_name: data.last_name, uid: data.uid} // parameters
+                                data: {first_name: data.first_name, last_name: data.last_name, uid: data.uid}
                             })
+                            window.location.assign("/welcome");
                         }
                     });
                 }

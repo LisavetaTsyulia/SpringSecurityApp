@@ -47,12 +47,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void save(User user) {
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        user.setStatus("ACTIVE");
-        Set<Role> roles = new HashSet<>();
-        roles.add(roleDao.getOne(1L));
-        user.setRoles(roles);
-        userDao.save(user);
+        User userDB = userDao.findByUsername(user.getUsername()) ;
+        if (userDB == null) {
+            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+            user.setStatus("ACTIVE");
+            Set<Role> roles = new HashSet<>();
+            roles.add(roleDao.getOne(1L));
+            user.setRoles(roles);
+            userDao.saveAndFlush(user);
+        }
     }
 
     @Override
