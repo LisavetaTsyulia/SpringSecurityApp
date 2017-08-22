@@ -1,11 +1,16 @@
 package net.proselyte.springsecurityapp.controller;
 
+import net.proselyte.springsecurityapp.model.Product;
 import net.proselyte.springsecurityapp.model.User;
+import net.proselyte.springsecurityapp.service.SearchService;
 import net.proselyte.springsecurityapp.service.SecurityService;
 import net.proselyte.springsecurityapp.service.UserService;
 import net.proselyte.springsecurityapp.validator.UserValidator;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -14,6 +19,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import com.ibm.icu.text.Transliterator;
 
+import java.io.*;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Controller
@@ -21,6 +30,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private SearchService searchService;
 
     @Autowired
     private SecurityService securityService;
@@ -111,32 +123,24 @@ public class UserController {
 
     }
 
-    @RequestMapping(value = {"/redirect"}, method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    String Submit(@RequestParam("first_name") String firstName,@RequestParam("last_name") String lastName,
-                  @RequestParam("uid") String id, Model model) {
+    @RequestMapping(value = {"/getmore"}, method = RequestMethod.GET)
+    public List<Product> getMore() {
+        List<Product> result = new ArrayList<>();
 
+        return result;
+    }
 
-        User user = new User();
-        /*
-        user.setStatus("ACTIVE");
-        user.setPassword(id);
-        String greek
-                = firstName+lastName;
-        String id2 = "Any-Latin; NFD; [^\\p{Alnum}] Remove";
-        String latin = Transliterator.getInstance(id2)
-                .transform(greek);
-        user.setUsername(latin);
-        System.out.println(latin);
-
-        userService.save(user);
-
-        securityService.autoLogin(user.getUsername(), user.getPassword());
-
-        model.addAttribute("theUser", user);
-        */
-        return "redirect:/welcome";
-
+    @RequestMapping(value = {"/search"}, method = RequestMethod.GET)
+    public String search(@RequestParam String request, Model model) {
+        try {
+            String req2 = URLEncoder.encode(request, "utf-8");
+            model.addAttribute("request", request);
+            List<Product> products = searchService.getProductsFromChipDip(req2.replaceAll(" ", "+"));
+            model.addAttribute("products", products);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return "search";
     }
 
 }

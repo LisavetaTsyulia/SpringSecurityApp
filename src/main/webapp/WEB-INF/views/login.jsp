@@ -18,6 +18,7 @@
 
     <link href="${contextPath}/resources/css/bootstrap.min.css" rel="stylesheet">
     <link href="${contextPath}/resources/css/common.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -25,54 +26,16 @@
 </head>
 
 <body>
-<script>
-    function checkLoginState() {
-        FB.getLoginStatus(function(response) {
-            statusChangeCallback(response);
-        });
-    }
-
-    function statusChangeCallback(response) {
-        if (response.status === 'connected') {
-            FB.api('/me', function(response) {
-                console.log(response);
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", "http://localhost:8087/new", true);
-                xhr.send(response);
-                if (xhr.status !== 200) {
-                    alert( xhr.status + ': ' + xhr.statusText );
-                } else {
-                    alert( xhr.responseText );
-                }
-            });
-        }
-    }
-
-    window.fbAsyncInit = function() {
-        FB.init({
-            appId      : '115210109141200',
-            cookie     : true,
-            xfbml      : true,
-            version    : 'v2.8'
-        });
-
-        FB.getLoginStatus(function(response) {
-            statusChangeCallback(response);
-        });
-
-    };
-
-    (function(d, s, id) {
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) return;
-        js = d.createElement(s); js.id = id;
-        js.src = "//connect.facebook.net/en_US/sdk.js";
-        fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
-</script>
+<div class="box">
+    <form method="get" action = "${contextPath}/search" >
+        <div class="container-1">
+            <span class="icon"><i class="fa fa-search"></i></span>
+            <input type="search" name = "request" id="search" placeholder="Search..." />
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </div>
+    </form>
+</div>
 <div class="container">
-
-
     <form method="POST" action="${contextPath}/login" class="form-signin">
         <h2 class="form-heading">Log in</h2>
 
@@ -86,10 +49,6 @@
 
             <button class="btn btn-lg btn-primary btn-block" type="submit">Log In</button>
             <h4 class="text-center"><a href="${contextPath}/registration">Create an account</a></h4>
-            <%--
-            <fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
-            </fb:login-button>
-            --%>
             <script src="//ulogin.ru/js/ulogin.js"></script>
             <div id="uLogin" data-ulogin="display=panel;theme=classic;fields=first_name,last_name,email;providers=vkontakte,odnoklassniki,mailru,facebook;hidden=other;redirect_uri=;callback=preview;mobilebuttons=0;"></div>
             <script>
@@ -97,14 +56,6 @@
                     $.getJSON("//ulogin.ru/token.php?host=" + encodeURIComponent(location.toString()) + "&token=" + token + "&callback=?", function (data) {
                        data = $.parseJSON(data.toString());
                         if (!data.error) {
-                            <%--
-                            $.ajax({
-                                type: "GET",
-                                url: "/redirect",
-                                data: {first_name: data.first_name, last_name: data.last_name, uid: data.uid}
-                            })
-                            --%>
-
                             window.location.assign("/welcome?first_name=" + data.first_name + "&last_name=" + data.last_name + "&uid=" + data.uid );
                         }
                     });
