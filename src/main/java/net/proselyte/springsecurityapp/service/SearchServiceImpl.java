@@ -7,8 +7,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,40 +17,79 @@ import java.util.List;
 public class SearchServiceImpl implements SearchService{
     public final static String BEL = "http://belchip.by/";
     public final static String CHIPDIP = "https://www.ru-chipdip.by";
-    @Override
-    public List<Product> getProductsFromBelchip(String query) {
-        List<Product> result = new ArrayList<>();
-        try {
-            Document doc = Jsoup.connect("http://belchip.by/search/?query=" + query).get();
-            Elements divElem = doc.getElementsByClass("cat-item");
-            for (Element div : divElem) {
-                Product product = new Product();
-                Elements links = div.select("a[href]");
-                Element priceElement = div.getElementsByClass("butt-add").first();
-                product.setImage(BEL + links.get(0).attr("href"));
-                product.setUrl(BEL + links.get(2).attr("href"));
-                product.setName(links.get(2).text());
-                if (priceElement.hasClass("denoPrice")) {
-                    Element denoPrice = priceElement.getElementsByClass("denoPrice").first();
-                    product.setPrice(denoPrice.text() +
-                            denoPrice.getElementsByTag("span").first().text());
-                }
-                result.add(product);
-            }
+    private int pointBelchip = 0;
+    private String theQuery;
+    private Elements belchipElements;
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return result;
+    public String getTheQuery() {
+        return theQuery;
+    }
+
+    private void setTheQuery(String theQuery) {
+        this.theQuery = theQuery;
     }
 
     @Override
-    public List<Product> getProductsFromChipDip(String query) {
+    public List<Product> getFirstPage(String query) {
+        List<Product> productList = new ArrayList<>();
+        setTheQuery(query);
+        pointBelchip = 0;
+        initBelchipSearch();
+        productList.addAll(getProductsFromBelchip(belchipElements));
+        //productList.addAll(getProductsFromChipDip(initChipdipSearch()));
+        return productList;
+    }
+
+    private void initBelchipSearch() {
+        try {
+            Document doc = Jsoup.connect("http://belchip.by/search/?query=" + getTheQuery()).get();
+            Elements divElements = doc.getElementsByClass("cat-item");
+            belchipElements = divElements;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Elements initChipdipSearch() {
+        Elements links = null;
+        try {
+            Document doc = Jsoup.connect("https://www.ru-chipdip.by/search?searchtext=" + getTheQuery()).get();
+            Elements ulElem = doc.getElementsByClass("serp__group-col");
+            links = ulElem.select("a[href]");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return links;
+    }
+
+    private List<Product> getProductsFromBelchip(Elements divElem) {
+        List<Product> result = new ArrayList<>();
+        int resSize = pointBelchip + 10;
+        if (resSize > divElem.size())
+            resSize = divElem.size();
+        for (int i = pointBelchip; i < resSize; i ++) {
+            Product product = new Product();
+            Elements links = divElem.get(i).select("a[href]");
+            Element priceElement = divElem.get(i).getElementsByClass("butt-add").first();
+            product.setImage(BEL + links.get(0).attr("href"));
+            product.setUrl(BEL + links.get(2).attr("href"));
+            product.setName(links.get(2).text());
+            Elements denoPrice = priceElement.getElementsByClass("denoPrice");
+            if (denoPrice.size() != 0) {
+                Element price = denoPrice.first();
+                product.setPrice(price.text());
+            } else {
+                product.setPrice("цена по запросу");
+            }
+            result.add(product);
+        }
+        pointBelchip = resSize;
+        return result;
+    }
+
+    private List<Product> getProductsFromChipDip(Elements links) {
         List<Product> result = new ArrayList<>();
         try {
-            Document doc = Jsoup.connect("https://www.ru-chipdip.by/search?searchtext=" + query).get();
-            Elements ulElem = doc.getElementsByClass("serp__group-col");
-            Elements links = ulElem.select("a[href]");
             for (Element link: links) {
                 System.out.println(link);
                 Document modul = Jsoup.connect(CHIPDIP + link.attr("href")).get();
@@ -61,14 +101,20 @@ public class SearchServiceImpl implements SearchService{
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return result;
     }
 
     @Override
-    public List<Product> getNextPage(String query) {
-        List<Product> productList = new ArrayList<>();
-
+    public List<Product> getNextPage() {
+        List<Product> productList = getProductsFromBelchip(belchipElements);
+        for (Product product : productList) {
+            try {
+                product.setName(URLEncoder.encode(product.getName(), "UTF-8"));
+                product.setPrice(URLEncoder.encode(product.getPrice(), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
         return productList;
     }
 

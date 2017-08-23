@@ -3,20 +3,65 @@
  * Copyright 2011-2015 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  *//*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
+#keywords {
+    margin: 0 auto;
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    background-color: white;
+}
+
+
+#keywords thead {
+    cursor: pointer;
+    background: #c9dff0;
+}
+#keywords thead tr th {
+    font-weight: bold;
+    padding: 12px 30px;
+    padding-left: 42px;
+}
+#keywords thead tr th span {
+    padding-right: 20px;
+    background-repeat: no-repeat;
+    background-position: 100% 100%;
+}
+
+#keywords thead tr th.headerSortUp, #keywords thead tr th.headerSortDown {
+    background: #acc8dd;
+}
+
+#keywords thead tr th.headerSortUp span {
+    background-image: url('https://i.imgur.com/SP99ZPJ.png');
+}
+#keywords thead tr th.headerSortDown span {
+    background-image: url('https://i.imgur.com/RkA9MBo.png');
+}
+
+
+#keywords tbody tr {
+    color: #555;
+}
+#keywords tbody tr td {
+    text-align: left;
+    padding: 15px 10px;
+}
+#keywords tbody tr td.lalign {
+    width: 450px !important;
+}
 
 .box{
-    margin: 5px auto;
+    margin: 10px auto;
     width: 300px;
-    height: 50px;
+    height: 70px;
 }
 .container-1 input#search{
     width: 300px;
     height: 50px;
-    background: #b0bfcd;
+    background: white;
     border: none;
     font-size: 10pt;
     float: left;
-    color: #63717f;
+    color: #4f5b66;
     padding-left: 45px;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;

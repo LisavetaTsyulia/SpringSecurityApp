@@ -127,23 +127,9 @@ public class UserController {
     @RequestMapping(value = {"/getmore"}, method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public String getMore() {
-        Product product = new Product();
-        product.setName("1");
-        product.setPrice("1.2");
-        product.setImage("url");
-        product.setUrl("url");
-        Product product2 = new Product();
-        product2.setName("2");
-        product2.setPrice("2.3");
-        product2.setUrl("https://vk.com/ilearning");
-        product2.setImage("https://upload.wikimedia.org/wikipedia/ru/thumb/b/bf/KFC_logo.svg/1200px-KFC_logo.svg.png");
-
-        List<Product> result = new ArrayList<>();
-        result.add(product);
-        result.add(product2);
+        List<Product> productList = searchService.getNextPage();
         Gson gson = new Gson();
-
-        return gson.toJson(result);
+        return gson.toJson(productList);
     }
 
     @RequestMapping(value = {"/search"}, method = RequestMethod.GET)
@@ -151,7 +137,7 @@ public class UserController {
         try {
             String req2 = URLEncoder.encode(request, "utf-8");
             model.addAttribute("request", request);
-            List<Product> products = searchService.getProductsFromChipDip(req2.replaceAll(" ", "+"));
+            List<Product> products = searchService.getFirstPage(req2.replaceAll(" ", "+"));
             model.addAttribute("products", products);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();

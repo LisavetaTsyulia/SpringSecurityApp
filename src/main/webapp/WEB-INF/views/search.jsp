@@ -35,27 +35,27 @@
         </div>
     </form>
 </div>
-
-
 <form id ="searchs" >
-    <table class = "table-responsive">
+    <table id="keywords" cellspacing="0" cellpadding="0">
+        <thead>
+        <tr>
+            <th><span>Image</span></th>
+            <th><span>Price</span></th>
+            <th><span>Name</span></th>
+        </tr>
+        </thead>
         <tbody id = "tbodyid">
         <c:forEach items="${products}" var="product">
             <tr>
-                <th class="glyphicon-th-list, text-left"> <a href=<c:out value = "${product.url}"/>/> <c:out value = "${product.url}"/></th>
-            </tr>
-            <tr>
-                <th class="glyphicon-th-list, text-left">
+                <td class="glyphicon-th-list, text-left, lalign">
                     <a href="${product.url}">
                         <img height="150" weight = "150" src = "${product.image}" alt = "sorry"/>
                     </a>
-                </th>
-                <th>
+                </td>
+                <td>
                     <c:out value = "${product.price}"/>
-                </th>
-            </tr>
-            <tr>
-                <th class="glyphicon-th-list, text-left"> <c:out value = "${product.name}"/> </th>
+                </td>
+                <td class="glyphicon-th-list, text-left, lalign"> <c:out value = "${product.name}"/> </td>
             </tr>
         </c:forEach>
         </tbody>
@@ -74,11 +74,12 @@
                 $.get("getmore", function(data) {
                     var html = '';
                     for (var i = 0; i < data.length; i++) {
-                        html += '<tr><th class="glyphicon-th-list, text-left"><a href="' + data[i].url  + '">' + data[i].url + '</a></th>' +
-                            '</tr><tr><th class="glyphicon-th-list, text-left">' +
+                        var dataname = decodeURIComponent(data[i].name).replace(/\+/gi, ' ');
+                        var dataprice = decodeURIComponent(data[i].price).replace(/\+/gi, ' ');
+                        html += '<tr><td class="glyphicon-th-list, text-left, lalign">' +
                             '   <a href="' + data[i].url + '"><img height="150" weight = "150" src = "' + data[i].image + '" alt = "sorry"/></a>' +
-                            '</th><th>' + data[i].price + '</th></tr><tr>' +
-                            '    <th class="glyphicon-th-list, text-left">' + data[i].name + '</th>' +
+                            '</td><td>' + dataprice + '</td>' +
+                            '    <td class="glyphicon-th-list, text-left, lalign">' + dataname + '</td>' +
                             '</tr>';
                     }
                     tbody.innerHTML += html;
