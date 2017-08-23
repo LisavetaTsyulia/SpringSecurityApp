@@ -7,6 +7,16 @@ public class Product {
 
     private String name;
 
+    private String price;
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
     public String getUrl() {
         return url;
     }
@@ -37,6 +47,7 @@ public class Product {
                 "url='" + url + '\'' +
                 ", image='" + image + '\'' +
                 ", name='" + name + '\'' +
+                ", price='" + price + '\'' +
                 '}';
     }
 }

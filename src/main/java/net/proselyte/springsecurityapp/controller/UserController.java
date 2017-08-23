@@ -1,5 +1,6 @@
 package net.proselyte.springsecurityapp.controller;
 
+import com.google.gson.Gson;
 import net.proselyte.springsecurityapp.model.Product;
 import net.proselyte.springsecurityapp.model.User;
 import net.proselyte.springsecurityapp.service.SearchService;
@@ -123,11 +124,26 @@ public class UserController {
 
     }
 
-    @RequestMapping(value = {"/getmore"}, method = RequestMethod.GET)
-    public List<Product> getMore() {
-        List<Product> result = new ArrayList<>();
+    @RequestMapping(value = {"/getmore"}, method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public String getMore() {
+        Product product = new Product();
+        product.setName("1");
+        product.setPrice("1.2");
+        product.setImage("url");
+        product.setUrl("url");
+        Product product2 = new Product();
+        product2.setName("2");
+        product2.setPrice("2.3");
+        product2.setUrl("https://vk.com/ilearning");
+        product2.setImage("https://upload.wikimedia.org/wikipedia/ru/thumb/b/bf/KFC_logo.svg/1200px-KFC_logo.svg.png");
 
-        return result;
+        List<Product> result = new ArrayList<>();
+        result.add(product);
+        result.add(product2);
+        Gson gson = new Gson();
+
+        return gson.toJson(result);
     }
 
     @RequestMapping(value = {"/search"}, method = RequestMethod.GET)
@@ -143,4 +159,23 @@ public class UserController {
         return "search";
     }
 
+    @RequestMapping(value = "/user-list/change")
+    public String userList(@RequestParam("personId") Long[] userIds, @RequestParam("button") String button, Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String name = auth.getName(); //get logged in username
+        User currentUser = userService.findByUsername(name);
+        if (currentUser.getStatus().equals("BLOCKED")) {
+            return "new";
+        }
+
+        if (button.equals("deleteButton")) {
+            for (long userId : userIds)
+                userService.delete(userId);
+        } else {
+            for (long userId : userIds)
+                userService.block(userId);
+        }
+        model.addAttribute("userList", userService.getAllUsers());
+        return "welcome";
+    }
 }

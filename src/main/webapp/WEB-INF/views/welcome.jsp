@@ -18,6 +18,7 @@
     <link href="${contextPath}/resources/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+<%--
 <div class="container">
 
     <c:if test="${pageContext.request.userPrincipal.name != null}">
@@ -61,7 +62,41 @@
     </table>
 
 </c:if>
-
+</div>
+--%>
+<div class="container">
+    <c:if test="${pageContext.request.userPrincipal.name != null}">
+    <form action="/user-list/change">
+        <button class="my_button custom" type = "submit" name="button" value="deleteButton">
+            Delete
+        </button>
+        <button class="my_button custom" type="submit" name="button" value="blockButton">
+            Block/Unblock
+        </button>
+        <table class = "table_price">
+            <c:forEach items="${userList}" var="user">
+                <c:if test="${pageContext.request.userPrincipal.name != user.username}">
+                    <tr class="th">
+                        <td class="th, text-left"><c:out value = "${user.username}"/> </td>
+                        <td class="th, text-center">
+                            <c:choose>
+                                <c:when test="${user.status.equals('BLOCKED')}">
+                                    Blocked
+                                </c:when>
+                                <c:otherwise>
+                                    Unblocked
+                                </c:otherwise>
+                            </c:choose>
+                        </td>
+                        <td class="th, text-center">
+                            <input type="checkbox" name="personId" value="${user.id}"/>
+                        </td>
+                    </tr>
+                </c:if>
+            </c:forEach>
+        </table>
+        <form/>
+        </c:if>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script src="${contextPath}/resources/js/bootstrap.min.js"></script>
