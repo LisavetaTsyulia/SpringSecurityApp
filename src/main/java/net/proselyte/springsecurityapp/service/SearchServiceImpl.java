@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -18,8 +19,7 @@ public class SearchServiceImpl implements SearchService{
     public final static String BEL = "http://belchip.by/";
     public final static String CHIPDIP = "https://www.ru-chipdip.by";
     private int pointBelchip = 0;
-    private int linknum = 0;
-    private boolean isHover = false;
+    private int linknum = -1;
     private String theQuery;
     private Elements belchipElements;
     private Elements chipdipLinks;
@@ -38,21 +38,29 @@ public class SearchServiceImpl implements SearchService{
         List<Product> productList = new ArrayList<>();
         setTheQuery(query);
         pointBelchip = 0;
-        //initBelchipSearch();
-        //productList.addAll(getProductsFromBelchip(belchipElements));
+        initBelchipSearch();
+        productList.addAll(getProductsFromBelchip(belchipElements));
         initChipdipSearch();
-        productList = getDocumentFromChipDip(chipdipLinks);
+        productList.addAll(getDocumentFromChipDip(chipdipLinks));
+        //Collections.shuffle(productList);
         return productList;
     }
 
     private void initBelchipSearch() {
-        try {
-            Document doc = Jsoup.connect("http://belchip.by/search/?query=" + getTheQuery()).get();
+
+            System.out.println("http://belchip.by/search/?query=" + getTheQuery());
+            Document doc = null;
+            for (int i = 0; i < 500; i ++) {
+                try{
+                    doc = Jsoup.connect("http://belchip.by/search/?query=" + getTheQuery()).get();
+                    break;
+                } catch (Exception ex) {
+
+                }
+            }
             Elements divElements = doc.getElementsByClass("cat-item");
             belchipElements = divElements;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
     private List<Product> getProductsFromBelchip(Elements divElem) {
@@ -86,7 +94,7 @@ public class SearchServiceImpl implements SearchService{
             Elements ulElem = doc.getElementsByClass("serp__group-col");
             chipdipLinks = ulElem.select("a[href]");
             if (chipdipLinks.size() != 0) {
-                linknum = 0;
+                linknum = -1;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -94,6 +102,8 @@ public class SearchServiceImpl implements SearchService{
     }
 
     private List<Product> getDocumentFromChipDip(Elements links) {
+        linknum++;
+        List<Product> productList = new ArrayList<>();
         try {
             if (linknum >= chipdipLinks.size()) {
                 curModul = null;
@@ -101,32 +111,24 @@ public class SearchServiceImpl implements SearchService{
             }
             curModul = Jsoup.connect(CHIPDIP + links.get(linknum).attr("href")).get();
             if (curModul.getElementsByClass("with-hover").size() != 0) {
-                isHover = true;
+                hoverClassSearch(productList);
             }
             else{
-                isHover = false;
+                itemClassSearch(productList);
             }
-            return getOnePageChipdip();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return productList;
     }
 
-    private List<Product> getOnePageChipdip() {
-        List<Product> result = new ArrayList<>();
-        if (isHover) {
-            hoverClassSearch(result);
-        } else {
-            itemClassSearch(result);
-        }
-        return result;
-    }
 
     @Override
     public List<Product> getNextPage() {
-        /*
+
         List<Product> productList = getProductsFromBelchip(belchipElements);
+        List<Product> productList2 = getDocumentFromChipDip(chipdipLinks);
+        productList.addAll(productList2);
         for (Product product : productList) {
             try {
                 product.setName(URLEncoder.encode(product.getName(), "UTF-8"));
@@ -135,27 +137,10 @@ public class SearchServiceImpl implements SearchService{
                 e.printStackTrace();
             }
         }
-        */
-        List<Product> productList2 = getProductsFromChipdip();
-        for (Product product : productList2) {
-            try {
-                product.setName(URLEncoder.encode(product.getName(), "UTF-8"));
-                product.setPrice(URLEncoder.encode(product.getPrice(), "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-        }
-        //productList.addAll(productList2);
-        return productList2;
-    }
-
-    private List<Product> getProductsFromChipdip() {
-        return getOnePageChipdip();
+        return productList;
     }
 
     private void itemClassSearch(List<Product> result) {
-        if (linknum > chipdipLinks.size())
-            return;
         Elements divElements = curModul.getElementsByClass("item__content");
         for (Element divElement : divElements) {
             Element direction = divElement.select("a[href]").get(0);
@@ -169,26 +154,19 @@ public class SearchServiceImpl implements SearchService{
             product.setPrice(priceElement.text());
             result.add(product);
         }
-            if (curModul.getElementsByClass("pager").size() == 0) {
-                linknum++;
-                getDocumentFromChipDip(chipdipLinks);
-            } else {
+            if (curModul.getElementsByClass("pager").size() != 0) {
                 Elements rightElements = curModul.getElementsByClass("right");
-                    if (rightElements.size() != 0) {
-                        if (rightElements.get(0).getElementsByTag("a").size() != 0) {
-                            try {
-                                curModul = Jsoup.connect(CHIPDIP + rightElements.select("a[href]").first().attr("href")).get();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            linknum++;
-                            getDocumentFromChipDip(chipdipLinks);
+                if (rightElements.size() != 0) {
+                    if (rightElements.get(0).getElementsByTag("a").size() != 0) {
+                        try {
+                            curModul = Jsoup.connect(CHIPDIP + rightElements.select("a[href]").first().attr("href")).get();
+                            itemClassSearch(result);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                     }
+                }
             }
-
-
     }
 
     private void hoverClassSearch( List<Product> result) {
@@ -207,24 +185,18 @@ public class SearchServiceImpl implements SearchService{
             product.setPrice(priceElement.text());
             result.add(product);
         }
-        if (curModul.getElementsByClass("pager__pages").size() == 0) {
-            linknum++;
-            getDocumentFromChipDip(chipdipLinks);
-        } else {
+        if (curModul.getElementsByClass("pager").size() != 0) {
             Elements rightElements = curModul.getElementsByClass("right");
             if (rightElements.size() != 0) {
                 if (rightElements.get(0).getElementsByTag("a").size() != 0) {
                     try {
                         curModul = Jsoup.connect(CHIPDIP + rightElements.select("a[href]").first().attr("href")).get();
+                        hoverClassSearch(result);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                } else {
-                    linknum ++;
-                    getDocumentFromChipDip(chipdipLinks);
                 }
             }
         }
-
     }
 }

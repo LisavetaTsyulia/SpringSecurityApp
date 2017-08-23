@@ -49,7 +49,7 @@
             <tr>
                 <td class="glyphicon-th-list, text-left, lalign">
                     <a href="${product.url}">
-                        <img height="150" weight = "150" src = "${product.image}" alt = "sorry"/>
+                        <img height="150" weight = "150" src = "${product.image}" alt = "image not found"/>
                     </a>
                 </td>
                 <td>
