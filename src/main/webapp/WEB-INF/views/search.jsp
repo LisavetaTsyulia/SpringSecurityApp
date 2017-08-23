@@ -67,8 +67,6 @@
         var contentLoadTriggered = false;
         var tbody = $("#tbodyid");
         window.onscroll = function() {
-            console.log(document.body.scrollTop);
-            console.log(tbody.height() - window.innerHeight);
             if (document.body.scrollTop >= tbody.height() - window.innerHeight && !contentLoadTriggered) {
                 contentLoadTriggered = true;
                 $.get("getmore", function(data) {
@@ -77,7 +75,7 @@
                         var dataname = decodeURIComponent(data[i].name).replace(/\+/gi, ' ');
                         var dataprice = decodeURIComponent(data[i].price).replace(/\+/gi, ' ');
                         html += '<tr><td class="glyphicon-th-list, text-left, lalign">' +
-                            '   <a href="' + data[i].url + '"><img height="150" weight = "150" src = "' + data[i].image + '" alt = "sorry"/></a>' +
+                            '   <a href="' + data[i].url + '"><img height="150" weight = "150" src = "' + data[i].image + '" alt = "image not found"/></a>' +
                             '</td><td>' + dataprice + '</td>' +
                             '    <td class="glyphicon-th-list, text-left, lalign">' + dataname + '</td>' +
                             '</tr>';
@@ -87,7 +85,6 @@
                     contentLoadTriggered = false;
                 });
             }
-
         };
     });
 </script>
